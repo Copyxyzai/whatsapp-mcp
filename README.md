@@ -110,11 +110,13 @@ Without this setup, you'll likely run into errors like:
 
 ## Architecture Overview
 
-This application consists of two main components:
+This application consists of three main components:
 
 1. **Go WhatsApp Bridge** (`whatsapp-bridge/`): A Go application that connects to WhatsApp's web API, handles authentication via QR code, and stores message history in SQLite. It serves as the bridge between WhatsApp and the MCP server.
 
 2. **Python MCP Server** (`whatsapp-mcp-server/`): A Python server implementing the Model Context Protocol (MCP), which provides standardized tools for Claude to interact with WhatsApp data and send/receive messages.
+
+3. **Web Interface** (`web-interface/`): A FastAPI-based REST API that provides HTTP endpoints for all WhatsApp functionality, enabling web and mobile applications to interact with WhatsApp. See [web-interface/README.md](web-interface/README.md) for details.
 
 ### Data Storage
 
@@ -124,7 +126,28 @@ This application consists of two main components:
 
 ## Usage
 
+You can interact with WhatsApp in two ways:
+
+### Option 1: Claude Desktop Integration (MCP)
+
 Once connected, you can interact with your WhatsApp contacts through Claude, leveraging Claude's AI capabilities in your WhatsApp conversations.
+
+### Option 2: Web Interface (REST API)
+
+For building web or mobile applications, you can use the FastAPI web interface:
+
+1. Start the web server:
+   ```bash
+   cd web-interface
+   pip install -r requirements.txt
+   python server.py
+   ```
+
+2. Access the API at `http://localhost:8000`
+   - Interactive docs: `http://localhost:8000/docs`
+   - API endpoints: `/api/contacts/search`, `/api/messages/send`, etc.
+
+See [web-interface/README.md](web-interface/README.md) for detailed API documentation and usage examples.
 
 ### MCP Tools
 
