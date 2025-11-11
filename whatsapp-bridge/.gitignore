@@ -1,0 +1,23 @@
+# Runtime-generated directories and databases
+store/
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+whatsapp-bridge
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Temporary files
+*.tmp
+*.log
