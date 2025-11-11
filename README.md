@@ -2,11 +2,23 @@
 
 [English](README.md) | [Português](LEIAME.md)
 
-This is a Model Context Protocol (MCP) server for WhatsApp.
+This is a Model Context Protocol (MCP) server for WhatsApp with an **optional web interface** for browser-based access.
 
 With this you can search and read your personal Whatsapp messages (including images, videos, documents, and audio messages), search your contacts and send messages to either individuals or groups. You can also send media files including images, videos, documents, and audio messages.
 
 It connects to your **personal WhatsApp account** directly via the Whatsapp web multidevice API (using the [whatsmeow](https://github.com/tulir/whatsmeow) library). All your messages are stored locally in a SQLite database and only sent to an LLM (such as Claude) when the agent accesses them through tools (which you control).
+
+## 🆕 Web Interface (Online Version)
+
+In addition to the MCP server for Claude/Cursor, we now offer a **web-based interface** that allows you to access your WhatsApp messages directly in your browser! 
+
+- 📱 Clean, WhatsApp-like interface
+- 💬 View all chats and send messages
+- 🔍 Search functionality
+- 🔄 Auto-refresh messages
+- 👥 Support for groups and individual chats
+
+[See Web Interface Documentation](web-interface/README.md)
 
 Here's an example of what you can do when it's connected to Claude.
 
@@ -110,11 +122,13 @@ Without this setup, you'll likely run into errors like:
 
 ## Architecture Overview
 
-This application consists of two main components:
+This application consists of three main components:
 
-1. **Go WhatsApp Bridge** (`whatsapp-bridge/`): A Go application that connects to WhatsApp's web API, handles authentication via QR code, and stores message history in SQLite. It serves as the bridge between WhatsApp and the MCP server.
+1. **Go WhatsApp Bridge** (`whatsapp-bridge/`): A Go application that connects to WhatsApp's web API, handles authentication via QR code, and stores message history in SQLite. It serves as the bridge between WhatsApp and the MCP server and exposes a REST API on port 8080.
 
 2. **Python MCP Server** (`whatsapp-mcp-server/`): A Python server implementing the Model Context Protocol (MCP), which provides standardized tools for Claude to interact with WhatsApp data and send/receive messages.
+
+3. **Web Interface** (`web-interface/`) **(Optional)**: A Flask-based web application that provides a browser-based interface to access WhatsApp messages, send messages, and search chats. Perfect for those who want a traditional web UI instead of using Claude Desktop.
 
 ### Data Storage
 
@@ -123,6 +137,22 @@ This application consists of two main components:
 - Messages are indexed for efficient searching and retrieval
 
 ## Usage
+
+You can interact with your WhatsApp in two ways:
+
+### 1. Web Interface (Browser-Based)
+
+For a traditional web interface experience:
+
+1. Make sure the WhatsApp bridge is running
+2. Navigate to the `web-interface` directory
+3. Install dependencies: `pip install -r requirements.txt`
+4. Run the web server: `python app.py`
+5. Open your browser to `http://localhost:5000`
+
+See the [Web Interface README](web-interface/README.md) for detailed instructions and features.
+
+### 2. MCP Integration (Claude/Cursor)
 
 Once connected, you can interact with your WhatsApp contacts through Claude, leveraging Claude's AI capabilities in your WhatsApp conversations.
 

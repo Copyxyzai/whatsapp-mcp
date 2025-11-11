@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp MCP - Web Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>WhatsApp MCP</h1>
+            <p class="subtitle">Web Interface</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar with chats list -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Chats</h2>
+                    <button id="refreshChatsBtn" class="btn-icon" title="Refresh chats">
+                        ↻
+                    </button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="searchChats" placeholder="Search chats...">
+                </div>
+                <div id="chatsList" class="chats-list">
+                    <div class="loading">Loading chats...</div>
+                </div>
+            </aside>
+
+            <!-- Chat view -->
+            <main class="chat-view">
+                <div id="welcomeScreen" class="welcome-screen">
+                    <h2>Welcome to WhatsApp MCP Web</h2>
+                    <p>Select a chat to start messaging</p>
+                </div>
+                
+                <div id="chatScreen" class="chat-screen" style="display: none;">
+                    <!-- Chat header -->
+                    <div class="chat-header">
+                        <div class="chat-info">
+                            <h3 id="chatName">Chat Name</h3>
+                            <p id="chatJid" class="chat-jid"></p>
+                        </div>
+                        <button id="refreshMessagesBtn" class="btn-icon" title="Refresh messages">
+                            ↻
+                        </button>
+                    </div>
+
+                    <!-- Messages area -->
+                    <div id="messagesArea" class="messages-area">
+                        <div class="loading">Loading messages...</div>
+                    </div>
+
+                    <!-- Message input -->
+                    <div class="message-input-area">
+                        <form id="messageForm">
+                            <input 
+                                type="text" 
+                                id="messageInput" 
+                                placeholder="Type a message..." 
+                                autocomplete="off"
+                                required
+                            >
+                            <button type="submit" class="btn-send">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
