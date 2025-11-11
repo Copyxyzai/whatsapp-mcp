@@ -40,6 +40,26 @@ Before running the web interface, make sure you have:
 
 ## Running the Web Interface
 
+### Quick Start (Recommended)
+
+**Linux/macOS:**
+```bash
+./start.sh
+```
+
+**Windows:**
+```batch
+start.bat
+```
+
+The startup script will:
+- Create a virtual environment (if needed)
+- Install dependencies automatically
+- Check if the WhatsApp bridge is running
+- Start the web server
+
+### Manual Start
+
 1. **Start the WhatsApp bridge** (in a separate terminal):
    ```bash
    cd ../whatsapp-bridge
@@ -87,6 +107,22 @@ The web interface consists of:
 2. **HTML Template** (`templates/index.html`): Single-page application structure
 3. **CSS** (`static/css/style.css`): WhatsApp-inspired styling
 4. **JavaScript** (`static/js/app.js`): Client-side logic for chat interaction
+
+### How it works:
+
+```
+┌─────────────┐      ┌──────────────┐      ┌─────────────────┐      ┌──────────┐
+│   Browser   │ ───> │ Flask Web    │ ───> │ Go WhatsApp     │ ───> │ WhatsApp │
+│   (User)    │ <─── │ Interface    │ <─── │ Bridge (API)    │ <─── │   Web    │
+└─────────────┘      └──────────────┘      └─────────────────┘      └──────────┘
+                            │                       │
+                            └───────────────────────┘
+                                       │
+                                  ┌─────────┐
+                                  │ SQLite  │
+                                  │ Database│
+                                  └─────────┘
+```
 
 ### API Endpoints
 
