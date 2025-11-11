@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp MCP Web Interface Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #25D366;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #25D366;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #20bd5a;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result pre {
+            margin-top: 10px;
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        
+        .api-status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .api-status.online {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .api-status.offline {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 WhatsApp MCP Web Interface</h1>
+            <p>REST API Demo - Send Messages & Search Contacts</p>
+        </div>
+        
+        <div class="content">
+            <div id="apiStatus" class="api-status">Checking API status...</div>
+            
+            <!-- Send Message Section -->
+            <div class="section">
+                <h2>📤 Send Message</h2>
+                <form id="sendMessageForm">
+                    <div class="form-group">
+                        <label for="recipient">Recipient (Phone or JID):</label>
+                        <input type="text" id="recipient" placeholder="e.g., 1234567890 or 1234567890@s.whatsapp.net" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" placeholder="Enter your message here..." required></textarea>
+                    </div>
+                    <button type="submit">Send Message</button>
+                </form>
+                <div id="sendResult" class="result"></div>
+            </div>
+            
+            <!-- Search Contacts Section -->
+            <div class="section">
+                <h2>🔍 Search Contacts</h2>
+                <form id="searchContactsForm">
+                    <div class="form-group">
+                        <label for="searchQuery">Search Query:</label>
+                        <input type="text" id="searchQuery" placeholder="Enter name or phone number" required>
+                    </div>
+                    <button type="submit">Search</button>
+                </form>
+                <div id="searchResult" class="result"></div>
+            </div>
+            
+            <!-- List Messages Section -->
+            <div class="section">
+                <h2>💬 List Recent Messages</h2>
+                <form id="listMessagesForm">
+                    <div class="form-group">
+                        <label for="messageLimit">Number of messages:</label>
+                        <input type="number" id="messageLimit" value="10" min="1" max="100">
+                    </div>
+                    <button type="submit">Get Messages</button>
+                </form>
+                <div id="messagesResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        
+        // Check API health status
+        async function checkAPIStatus() {
+            const statusDiv = document.getElementById('apiStatus');
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                if (response.ok) {
+                    statusDiv.className = 'api-status online';
+                    statusDiv.textContent = '✅ API Server is online and ready';
+                } else {
+                    throw new Error('API returned error');
+                }
+            } catch (error) {
+                statusDiv.className = 'api-status offline';
+                statusDiv.textContent = '❌ API Server is offline. Please start the server: python server.py';
+            }
+        }
+        
+        // Send Message
+        document.getElementById('sendMessageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('sendResult');
+            const button = e.target.querySelector('button');
+            
+            button.disabled = true;
+            resultDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/messages/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        recipient: document.getElementById('recipient').value,
+                        message: document.getElementById('message').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.className = data.success ? 'result success' : 'result error';
+                resultDiv.innerHTML = `
+                    <strong>${data.success ? '✅ Success' : '❌ Error'}</strong>
+                    <p>${data.message}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                resultDiv.style.display = 'block';
+                
+                if (data.success) {
+                    document.getElementById('message').value = '';
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Error</strong><p>${error.message}</p>`;
+                resultDiv.style.display = 'block';
+            } finally {
+                button.disabled = false;
+            }
+        });
+        
+        // Search Contacts
+        document.getElementById('searchContactsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('searchResult');
+            const button = e.target.querySelector('button');
+            
+            button.disabled = true;
+            resultDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/contacts/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: document.getElementById('searchQuery').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `
+                    <strong>✅ Found ${data.length} contact(s)</strong>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Error</strong><p>${error.message}</p>`;
+                resultDiv.style.display = 'block';
+            } finally {
+                button.disabled = false;
+            }
+        });
+        
+        // List Messages
+        document.getElementById('listMessagesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('messagesResult');
+            const button = e.target.querySelector('button');
+            
+            button.disabled = true;
+            resultDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/messages/list`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        limit: parseInt(document.getElementById('messageLimit').value),
+                        page: 0
+                    })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `
+                    <strong>✅ Retrieved ${data.length} message(s)</strong>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Error</strong><p>${error.message}</p>`;
+                resultDiv.style.display = 'block';
+            } finally {
+                button.disabled = false;
+            }
+        });
+        
+        // Check API status on page load
+        checkAPIStatus();
+        // Check status every 30 seconds
+        setInterval(checkAPIStatus, 30000);
+    </script>
+</body>
+</html>
