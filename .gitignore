@@ -1,3 +1,22 @@
+# SQLite databases
 *.db
+*.db-shm
+*.db-wal
+
+# Configuration files
 claude_desktop_config.json
-whatsapp.log
+
+# Log files
+*.log
+
+# Runtime data directories
+store/
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# OS-specific files
+.DS_Store
+Thumbs.db

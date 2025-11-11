@@ -1,0 +1,23 @@
+# Runtime data (databases and downloaded media)
+store/
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+whatsapp-bridge
+
+# Go test files
+*.test
+*.out
+*.prof
+coverage.txt
+
+# Temporary files
+*.tmp
+*.log
+
+# Vendor directory
+vendor/
