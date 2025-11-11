@@ -8,3 +8,17 @@ wheels/
 
 # Virtual environments
 .venv
+venv/
+env/
+
+# Temporary files
+*.tmp
+*.log
+.pytest_cache/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

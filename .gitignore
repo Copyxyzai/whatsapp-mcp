@@ -1,3 +1,18 @@
 *.db
+*.db-shm
+*.db-wal
 claude_desktop_config.json
-whatsapp.log
+*.log
+
+# Runtime-generated directories
+store/
+whatsapp-bridge/store/
+
+# Temporary and downloaded media files
+*.tmp
+temp/
+tmp/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
