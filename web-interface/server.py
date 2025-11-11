@@ -119,8 +119,8 @@ async def search_contacts(request: SearchContactsRequest) -> List[Dict[str, Any]
     try:
         contacts = whatsapp_search_contacts(request.query)
         return contacts
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to search contacts")
 
 @app.post("/api/messages/list")
 async def list_messages(request: ListMessagesRequest) -> List[Dict[str, Any]]:
@@ -139,8 +139,8 @@ async def list_messages(request: ListMessagesRequest) -> List[Dict[str, Any]]:
             context_after=request.context_after
         )
         return messages
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to list messages")
 
 @app.post("/api/chats/list")
 async def list_chats(request: ListChatsRequest) -> List[Dict[str, Any]]:
@@ -154,8 +154,8 @@ async def list_chats(request: ListChatsRequest) -> List[Dict[str, Any]]:
             sort_by=request.sort_by
         )
         return chats
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to list chats")
 
 @app.post("/api/chats/get")
 async def get_chat(request: GetChatRequest) -> Dict[str, Any]:
@@ -163,8 +163,8 @@ async def get_chat(request: GetChatRequest) -> Dict[str, Any]:
     try:
         chat = whatsapp_get_chat(request.chat_jid, request.include_last_message)
         return chat
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to get chat")
 
 @app.post("/api/chats/get-by-contact")
 async def get_direct_chat_by_contact(request: GetDirectChatByContactRequest) -> Dict[str, Any]:
@@ -172,8 +172,8 @@ async def get_direct_chat_by_contact(request: GetDirectChatByContactRequest) -> 
     try:
         chat = whatsapp_get_direct_chat_by_contact(request.sender_phone_number)
         return chat
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to get chat by contact")
 
 @app.post("/api/chats/get-contact-chats")
 async def get_contact_chats(request: GetContactChatsRequest) -> List[Dict[str, Any]]:
@@ -181,8 +181,8 @@ async def get_contact_chats(request: GetContactChatsRequest) -> List[Dict[str, A
     try:
         chats = whatsapp_get_contact_chats(request.jid, request.limit, request.page)
         return chats
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to get contact chats")
 
 @app.post("/api/interactions/get-last")
 async def get_last_interaction(request: GetLastInteractionRequest) -> str:
@@ -190,8 +190,8 @@ async def get_last_interaction(request: GetLastInteractionRequest) -> str:
     try:
         message = whatsapp_get_last_interaction(request.jid)
         return message
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to get last interaction")
 
 @app.post("/api/messages/get-context")
 async def get_message_context(request: GetMessageContextRequest) -> Dict[str, Any]:
@@ -199,8 +199,8 @@ async def get_message_context(request: GetMessageContextRequest) -> Dict[str, An
     try:
         context = whatsapp_get_message_context(request.message_id, request.before, request.after)
         return context
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to get message context")
 
 @app.post("/api/messages/send")
 async def send_message(request: SendMessageRequest) -> Dict[str, Any]:
@@ -214,8 +214,10 @@ async def send_message(request: SendMessageRequest) -> Dict[str, Any]:
             "success": success,
             "message": status_message
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to send message")
 
 @app.post("/api/files/send")
 async def send_file(request: SendFileRequest) -> Dict[str, Any]:
@@ -226,8 +228,10 @@ async def send_file(request: SendFileRequest) -> Dict[str, Any]:
             "success": success,
             "message": status_message
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to send file")
 
 @app.post("/api/audio/send")
 async def send_audio_message(request: SendAudioMessageRequest) -> Dict[str, Any]:
@@ -238,8 +242,10 @@ async def send_audio_message(request: SendAudioMessageRequest) -> Dict[str, Any]
             "success": success,
             "message": status_message
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to send audio message")
 
 @app.post("/api/media/download")
 async def download_media(request: DownloadMediaRequest) -> Dict[str, Any]:
@@ -258,8 +264,8 @@ async def download_media(request: DownloadMediaRequest) -> Dict[str, Any]:
                 "success": False,
                 "message": "Failed to download media"
             }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to download media")
 
 @app.get("/api/health")
 async def health_check():
